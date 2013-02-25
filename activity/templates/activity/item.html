@@ -1,0 +1,11 @@
+{% load i18n %}
+<div class="activity">
+    {% if actor.get_absolute_url %}<a href="{{ actor.get_absolute_url }}">{{ actor }}</a>
+    {% else %}{{ actor }}{% endif %}
+    {{verb}}
+    {% if target %}
+        {% if target.get_absolute_url %}
+            <a href="{{ target.get_absolute_url }}">{{ target }}</a>
+        {% else %}{{target}}{% endif %}
+    {% endif %} {{since}} {% trans "ago" %}
+</div>

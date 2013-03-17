@@ -1,13 +1,14 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from django.contrib.auth.models import User
 
 from django.utils.translation import ugettext as _
 
+from activity.compat import User
 from activity.registry import activityregistry
 from activity.signals import action
 from activity.managers import ActionManager, FollowManager
+
 
 class Action(models.Model):
     """

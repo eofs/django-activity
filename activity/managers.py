@@ -6,17 +6,46 @@ from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
 
 class ActionQuerySet(QuerySet):
-    def public(self, public=True):
+    def public(self, *args, **kwargs):
         """
         Return list of public actions
         """
-        return self.filter(public=public)
+        kwargs['public'] = True
+        return self.filter(*args, **kwargs)
 
-    def private(self):
+    def private(self, *args, **kwargs):
         """
         Return list of private actions
         """
-        return self.public(False)
+        kwargs['public'] = False
+        return self.filter(*args, **kwargs)
+
+    def actor(self, obj, **kwargs):
+        """
+        Return list of actions where object is the actor
+        """
+        content_type = ContentType.objects.get_for_model(obj).pk
+        return self.filter(actor_content_type=content_type,
+                           actor_object_id=obj.pk,
+                           **kwargs)
+
+    def target(self, obj, **kwargs):
+        """
+        Return list of actions where object is the target
+        """
+        content_type = ContentType.objects.get_for_model(obj).pk
+        return self.filter(target_content_type=content_type,
+                           target_object_id=obj.pk,
+                           **kwargs)
+
+    def action_object(self, obj, **kwargs):
+        """
+        Return list of actions where object is the action object
+        """
+        content_type = ContentType.objects.get_for_model(obj).pk
+        return self.filter(action_object_content_type=content_type,
+                           action_object_object_id=obj.pk,
+                           **kwargs)
 
     def user(self, user, **kwargs):
         """

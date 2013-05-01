@@ -25,7 +25,10 @@ class ActivitiesView(object):
         """
         Get public activities
         """
-        result = Action.objects.public(public)[:limit]
+        if public:
+            result = Action.objects.public()[:limit]
+        else:
+            result = Action.objects.private()[:limit]
         if render:
             return self.render(result)
         return result

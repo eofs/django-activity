@@ -41,11 +41,28 @@ class Action(models.Model):
     def __unicode__(self):
         values = {
             'actor': self.actor,
-            'handler': self.handler,
+            'verb': self.verb,
+            'action_object': 'joo',
             'target': self.target,
             'since': self.timesince()
         }
-        return _('%(handler)s by %(actor)s, %(target)s [%(since)s ago]') % values
+        if self.target:
+            if self.action_object:
+                return _('%(actor)s %(verb)s %(action_object)s on %(target)s %(since)s ago') % values
+            else:
+                return _('%(actor)s %(verb)s %(target)s %(since)s ago') % values
+        if self.action_object:
+            return _('%(actor)s %(verb)s %(action_object)s %(since)s ago') % values
+        return _('%(actor)s %(verb)s %(since)s ago') % values
+
+    @property
+    def verb(self):
+        """
+        Get action's verb
+        """
+        handlers = activityregistry.get_handlers()
+        handler = handlers[self.handler]
+        return handler.verb
 
     def timesince(self, now=None):
         """

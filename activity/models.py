@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
+from django.utils.timesince import timesince as _timesince
 from django.utils.translation import ugettext as _
 
 from activity.registry import activityregistry
@@ -68,7 +69,6 @@ class Action(models.Model):
         """
         Shortcut for ``django.utils.timesince.timesince`` function
         """
-        from django.utils.timesince import timesince as _timesince
         return _timesince(self.created, now)
 
 class Follow(models.Model):

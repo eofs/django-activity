@@ -1,4 +1,5 @@
 from django.template.loader import render_to_string
+from django.utils.timesince import timesince as _timesince
 from django.utils.translation import ugettext as _
 
 
@@ -27,7 +28,6 @@ class ActionHandler(object):
         """
         Shortcut for ``django.utils.timesince.timesince`` function
         """
-        from django.utils.timesince import timesince as _timesince
         return _timesince(time, now)
 
 

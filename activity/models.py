@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 
 from activity.registry import activityregistry
 from activity.signals import action
-from activity.managers import ActionManager, FollowManager
+from activity.managers import ActionManager, FollowManager, StreamManager
 
 
 class Action(models.Model):
@@ -70,6 +70,21 @@ class Action(models.Model):
         Shortcut for ``django.utils.timesince.timesince`` function
         """
         return _timesince(self.created, now)
+
+
+class Stream(models.Model):
+    """
+    User's activity stream item. This is used to prepopulate activity streams
+    and to avoid scans on Action table.
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    action = models.ForeignKey(Action)
+
+    objects = StreamManager()
+
+    class Meta:
+        unique_together = ('user', 'action')
+
 
 class Follow(models.Model):
     """

@@ -4,6 +4,8 @@ from django.db.models import Manager, Q, get_model
 from django.db.models.query import QuerySet
 
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
+
 
 class ActionQuerySet(QuerySet):
     def public(self, *args, **kwargs):
@@ -101,6 +103,18 @@ class ActionManager(Manager):
             return getattr(self.__class__, attr, *args)
         except AttributeError:
             return getattr(self.get_query_set(), attr, *args)
+
+
+class StreamManager(Manager):
+    def fanout(self, action, follower_ids, batch_size=500):
+        """
+        Fan-out action to other streams based on followers list.
+        """
+        if action.public:
+            streams = (self.model(user_id=follower_id, action=action) for follower_id in follower_ids)
+            return self.bulk_create(streams, batch_size=batch_size)
+        raise PermissionDenied('This action item is marked as private. Fan-out operation forbidden.')
+
 
 class FollowManager(Manager):
     """

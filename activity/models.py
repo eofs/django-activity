@@ -65,7 +65,7 @@ class Follow(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     follow_object = generic.GenericForeignKey()
-    actor_only = models.BooleanField('Only follow actions where the object is the target', default=True)
+    actor_only = models.BooleanField('Only follow actions where the object is the actor', default=True)
 
     started = models.DateTimeField(auto_now_add=True)
 

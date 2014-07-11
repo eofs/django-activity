@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 class AlreadyRegistered(Exception):
     pass
 
+
 class ActionHandler(object):
     template_name = 'activity/item.html'
     verb = 'created'

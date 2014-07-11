@@ -51,7 +51,6 @@ class ActionQuerySet(QuerySet):
         """
         Return list of most recent actions by objects that the given user is following
         """
-
         # Base filter
         q = Q()
         # Base QueryString
@@ -130,7 +129,7 @@ class FollowManager(Manager):
         """
         return [follow.user for follow in self.filter(
                 content_type=ContentType.objects.get_for_model(actor),
-            object_id=actor.pk).select_related('user')]
+                object_id=actor.pk).select_related('user')]
 
     def following(self, user, *models):
         """
@@ -138,7 +137,6 @@ class FollowManager(Manager):
         You may restrict the search by giving list of models.
         e.g. following(user, User) returns list of users the user is following
         """
-
         queryset = self.filter(user=user)
         if len(models):
             queryset = queryset.filter(content_type__in=(

@@ -1,10 +1,10 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
 from django.utils.translation import ugettext as _
 
-from activity.compat import User
 from activity.registry import activityregistry
 from activity.signals import action
 from activity.managers import ActionManager, FollowManager
@@ -16,7 +16,6 @@ class Action(models.Model):
 
     Naming convention from http://activitystrea.ms/specs/atom/1.0/
     """
-
     handler = models.CharField(max_length=255)
 
     actor_content_type = models.ForeignKey(ContentType, related_name='actor')
@@ -59,7 +58,7 @@ class Follow(models.Model):
     """
     Let user to follow activities of any user or object
     """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     # Object to Follow
     content_type = models.ForeignKey(ContentType)

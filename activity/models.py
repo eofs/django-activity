@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from activity.registry import activityregistry
 from activity.signals import action
 from activity.managers import ActionManager, FollowManager, StreamManager
+from activity.tasks import fanout_action
 
 
 class Action(models.Model):
@@ -33,6 +34,7 @@ class Action(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     public = models.BooleanField(default=True)
+    is_global = models.BooleanField(default=False)
 
     objects = ActionManager()
 
@@ -74,7 +76,7 @@ class Action(models.Model):
 
 class Stream(models.Model):
     """
-    User's activity stream item. This is used to prepopulate activity streams
+    User's activity stream item. This is used to pre-populate activity streams
     and to avoid scans on Action table.
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -114,11 +116,13 @@ def action_handler(sender, **kwargs):
     handlers = activityregistry.get_handlers()
     handler_name = kwargs.get('handler')
     actor = kwargs.get('actor')
+    is_global = kwargs.get('is_global', False)
     if handler_name in handlers:
         action = Action(
             handler=handler_name,
             actor_content_type=ContentType.objects.get_for_model(actor),
             actor_object_id=actor.pk,
+            is_global=is_global,
         )
         for opt in ('action_object', 'target'):
             obj = kwargs.get(opt, None)
@@ -127,6 +131,9 @@ def action_handler(sender, **kwargs):
                 setattr(action, '%s_content_type' % opt,
                         ContentType.objects.get_for_model(obj))
         action.save()
+
+        # Fanout action (populate streams)
+        fanout_action.delay(action.pk)
 
 
 action.connect(action_handler, dispatch_uid='activity.models')

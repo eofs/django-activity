@@ -85,6 +85,13 @@ class ActionQuerySet(QuerySet):
             )
         return qs.filter(q, **kwargs)
 
+    def stream(self, user, **kwargs):
+        """
+        Return list of actions based on user specific stream. Also global actions are returned.
+        """
+        qs = self.public()
+        return qs.filter(Q(stream__user=user) | Q(is_global=True))
+
 
 class ActionManager(Manager):
     """

@@ -8,11 +8,13 @@ class ActionAdmin(admin.ModelAdmin):
                     'actor_content_type', 'actor',
                     'verb',
                     'action_object_content_type', 'action_object',
-                    'target_content_type', 'target')
+                    'target_content_type', 'target',
+                    'is_global',)
     list_filter = ('handler',
                    'actor_content_type',
                    'action_object_content_type',
-                   'target_content_type')
+                   'target_content_type',
+                   'is_global',)
 
 admin.site.register(Action, ActionAdmin)
 

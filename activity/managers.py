@@ -4,6 +4,8 @@ from django.db.models import Manager, Q, get_model
 from django.db.models.query import QuerySet
 
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
+
 
 class ActionQuerySet(QuerySet):
     def public(self, *args, **kwargs):
@@ -51,7 +53,6 @@ class ActionQuerySet(QuerySet):
         """
         Return list of most recent actions by objects that the given user is following
         """
-
         # Base filter
         q = Q()
         # Base QueryString
@@ -84,6 +85,13 @@ class ActionQuerySet(QuerySet):
             )
         return qs.filter(q, **kwargs)
 
+    def stream(self, user, **kwargs):
+        """
+        Return list of actions based on user specific stream. Also global actions are returned.
+        """
+        qs = self.public()
+        return qs.filter(Q(stream__user=user) | Q(is_global=True))
+
 
 class ActionManager(Manager):
     """
@@ -102,6 +110,18 @@ class ActionManager(Manager):
             return getattr(self.__class__, attr, *args)
         except AttributeError:
             return getattr(self.get_query_set(), attr, *args)
+
+
+class StreamManager(Manager):
+    def fanout(self, action, follower_ids, batch_size=500):
+        """
+        Fan-out action to other streams based on followers list.
+        """
+        if action.public:
+            streams = (self.model(user_id=follower_id, action=action) for follower_id in follower_ids)
+            return self.bulk_create(streams, batch_size=batch_size)
+        raise PermissionDenied('This action item is marked as private. Fan-out operation forbidden.')
+
 
 class FollowManager(Manager):
     """
@@ -130,7 +150,7 @@ class FollowManager(Manager):
         """
         return [follow.user for follow in self.filter(
                 content_type=ContentType.objects.get_for_model(actor),
-            object_id=actor.pk).select_related('user')]
+                object_id=actor.pk).select_related('user')]
 
     def following(self, user, *models):
         """
@@ -138,7 +158,6 @@ class FollowManager(Manager):
         You may restrict the search by giving list of models.
         e.g. following(user, User) returns list of users the user is following
         """
-
         queryset = self.filter(user=user)
         if len(models):
             queryset = queryset.filter(content_type__in=(

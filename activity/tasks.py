@@ -38,9 +38,12 @@ def fanout_action(action_id):
         content_type=user_type,
         object_id=action.actor.pk,
         actor_only=True).values_list('user__pk')
-    followers_ids, = zip(*followers)
 
-    Stream.objects.fanout(action, followers_ids)
+    if followers.count():
+        followers_ids, = zip(*followers)
+        Stream.objects.fanout(action, followers_ids)
+        logger.info('Stream population completed')
+    else:
+        logger.info('No followers, skipping')
 
-    logger.info('Stream population completed')
     return True

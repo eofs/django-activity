@@ -28,6 +28,6 @@ admin.site.register(Stream, StreamAdmin)
 class FollowAdmin(admin.ModelAdmin):
     list_display = ('user', 'follow_object', 'content_type', 'actor_only')
     list_filter = ('actor_only', 'content_type')
-    search_fields = ('user',)
+    search_fields = ('user__username',)
 
 admin.site.register(Follow, FollowAdmin)

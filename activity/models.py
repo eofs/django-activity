@@ -45,7 +45,7 @@ class Action(models.Model):
         values = {
             'actor': self.actor,
             'verb': self.verb,
-            'action_object': 'joo',
+            'action_object': self.action_object,
             'target': self.target,
             'since': self.timesince()
         }

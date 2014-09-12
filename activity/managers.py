@@ -89,10 +89,10 @@ class ActionQuerySet(QuerySet):
 
     def stream(self, user, **kwargs):
         """
-        Return list of actions based on user specific stream. Also global actions are returned.
+        Return list of actions based on user specific stream.
         """
         qs = self.public()
-        return qs.filter(Q(stream__user=user) | Q(is_global=True))
+        return qs.filter(stream__user=user)
 
 
 class ActionManager(Manager):
@@ -115,15 +115,15 @@ class ActionManager(Manager):
 
 
 class StreamManager(Manager):
-    def fanout(self, action, follower_ids, batch_size=500):
+    def fanout(self, action, user_ids, batch_size=500):
         """
-        Fan-out action to other streams based on followers list.
+        Fan-out action to other streams based on user list.
         """
         if action.public:
-            pre_fanout.signal(self.__class__, action=action)
-            streams = (self.model(user_id=follower_id, action=action) for follower_id in follower_ids)
+            pre_fanout.send(sender=self.__class__, action=action)
+            streams = (self.model(user_id=user_id, action=action) for user_id in user_ids)
             objs = self.bulk_create(streams, batch_size=batch_size)
-            post_fanout.signal(self.__class__, action=action)
+            post_fanout.send(sender=self.__class__, action=action)
             return objs
         raise PermissionDenied('This action item is marked as private. Fan-out operation forbidden.')
 

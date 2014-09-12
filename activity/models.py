@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
@@ -112,6 +114,16 @@ class Follow(models.Model):
         return u'%s follows %s' % (self.user, self.follow_object)
 
 
+@receiver(post_save, sender=Action)
+def action_post_save_fanout(sender, instance, created, **kwargs):
+    """
+    Fanout action if new instance saved
+    """
+    if created:
+        # Fanout action (populate streams)
+        fanout_action.delay(instance.pk)
+
+
 def action_handler(sender, **kwargs):
     handlers = activityregistry.get_handlers()
     handler_name = kwargs.get('handler')
@@ -131,9 +143,6 @@ def action_handler(sender, **kwargs):
                 setattr(action, '%s_content_type' % opt,
                         ContentType.objects.get_for_model(obj))
         action.save()
-
-        # Fanout action (populate streams)
-        fanout_action.delay(action.pk)
 
 
 action.connect(action_handler, dispatch_uid='activity.models')

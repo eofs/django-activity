@@ -6,6 +6,8 @@ from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 
+from activity.signals import pre_fanout, post_fanout
+
 
 class ActionQuerySet(QuerySet):
     def public(self, *args, **kwargs):
@@ -118,8 +120,11 @@ class StreamManager(Manager):
         Fan-out action to other streams based on followers list.
         """
         if action.public:
+            pre_fanout.signal(self.__class__, action=action)
             streams = (self.model(user_id=follower_id, action=action) for follower_id in follower_ids)
-            return self.bulk_create(streams, batch_size=batch_size)
+            objs = self.bulk_create(streams, batch_size=batch_size)
+            post_fanout.signal(self.__class__, action=action)
+            return objs
         raise PermissionDenied('This action item is marked as private. Fan-out operation forbidden.')
 
 

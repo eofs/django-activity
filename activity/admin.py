@@ -20,13 +20,18 @@ admin.site.register(Action, ActionAdmin)
 
 
 class StreamAdmin(admin.ModelAdmin):
-    list_display = ('user', 'action', 'get_handler')
+    list_display = ('user', 'action', 'get_created', 'get_handler')
     list_filter = ('action__handler',
                    'action__is_global',
                    'action__actor_content_type',
                    'action__action_object_content_type',
                    'action__target_content_type')
     search_fields = ('user__username',)
+
+    def get_created(self, obj):
+        return obj.action.created
+    get_created.short_description = 'Created'
+    get_created.admin_order_field = 'action__created'
 
     def get_handler(self, obj):
         return obj.action.handler

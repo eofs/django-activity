@@ -61,13 +61,19 @@ class Action(models.Model):
         return _('%(actor)s %(verb)s %(since)s ago') % values
 
     @property
+    def action_handler(self):
+        """
+        Get action handler object
+        """
+        handlers = activityregistry.get_handlers()
+        return handlers[self.handler]
+
+    @property
     def verb(self):
         """
         Get action's verb
         """
-        handlers = activityregistry.get_handlers()
-        handler = handlers[self.handler]
-        return handler.verb
+        return self.action_handler.verb
 
     def timesince(self, now=None):
         """

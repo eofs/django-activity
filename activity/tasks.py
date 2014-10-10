@@ -1,3 +1,5 @@
+import itertools
+
 from celery import task
 from celery.utils.log import get_task_logger
 
@@ -14,6 +16,7 @@ def fanout_action(action_id):
     Fan-out action to feeds. Usually called when writing an action.
     """
     from activity.models import Action, Follow, Stream
+
     User = get_user_model()
     logger.info('Populating feeds')
 
@@ -42,8 +45,14 @@ def fanout_action(action_id):
             object_id=action.actor.pk,
             actor_only=True).values_list('user__pk', flat=True)
 
-        if followers.count():
-            Stream.objects.fanout(action, followers)
+        # Get extra targets from activity handler
+        extra = action.action_handler.fanout_extra_targets(action)
+
+        # Combine targets and remove duplicates
+        targets = list(set(itertools.chain(followers, extra)))
+
+        if len(targets):
+            Stream.objects.fanout(action, targets)
             logger.info('Stream population completed')
         else:
             logger.info('No followers, skipping')

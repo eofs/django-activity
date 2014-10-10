@@ -30,6 +30,13 @@ class ActionHandler(object):
         """
         return _timesince(time, now)
 
+    def fanout_extra_targets(self, item):
+        """
+        Extra targets to use in fan-out operation. Returned values are merged
+        into target list created using Follow-objects.
+        """
+        return []
+
 
 class ActivityRegistry(object):
     handlers = {}

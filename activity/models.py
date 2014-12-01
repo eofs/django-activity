@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import models
+from django.db import models, connection
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.contenttypes.models import ContentType
@@ -127,7 +127,11 @@ def action_post_save_fanout(sender, instance, created, **kwargs):
     """
     if created:
         # Fanout action (populate streams)
-        fanout_action.delay(instance.pk)
+        if hasattr(connection, 'on_commit'):
+            # Use django-transaction-hook to trigger tasks after transaction commit
+            connection.on_commit(lambda: fanout_action.delay(instance.pk))
+        else:
+            fanout_action.delay(instance.pk)
 
 
 def action_handler(sender, **kwargs):

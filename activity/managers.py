@@ -99,19 +99,18 @@ class ActionManager(Manager):
     """
     Manager for Action model
     """
-
-    def get_query_set(self):
+    def get_queryset(self):
         return ActionQuerySet(self.model, using=self._db)
 
     def __getattr__(self, attr, *args):
         """
-        Pass every method/attr acceess call to ActionQuerySet if
+        Pass every method/attr access call to ActionQuerySet if
         it has requested element available.
         """
         try:
             return getattr(self.__class__, attr, *args)
         except AttributeError:
-            return getattr(self.get_query_set(), attr, *args)
+            return getattr(self.get_queryset(), attr, *args)
 
 
 class StreamManager(Manager):

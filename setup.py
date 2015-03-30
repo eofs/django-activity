@@ -15,7 +15,7 @@ author = 'Tomi Pajunen'
 author_email = 'tomi@madlab.fi'
 license = 'BSD'
 install_requires = [
-    'django>=1.4'
+    'django>=1.7'
 ]
 
 

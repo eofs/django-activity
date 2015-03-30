@@ -1,6 +1,7 @@
 from collections import defaultdict
+from django.apps import apps
 
-from django.db.models import Manager, Q, get_model
+from django.db.models import Manager, Q
 from django.db.models.query import QuerySet
 
 from django.contrib.contenttypes.models import ContentType
@@ -63,7 +64,7 @@ class ActionQuerySet(QuerySet):
         actors_by_content_type = defaultdict(lambda: [])
         others_by_content_type = defaultdict(lambda: [])
 
-        following = get_model('activity', 'Follow').objects.filter(user=user).values_list('content_type_id', 'object_id', 'actor_only')
+        following = apps.get_model('activity', 'Follow').objects.filter(user=user).values_list('content_type_id', 'object_id', 'actor_only')
         if not following:
             return qs.none()
 
@@ -131,7 +132,6 @@ class FollowManager(Manager):
     """
     Manager for Follow model
     """
-
     def for_object(self, target):
         """
         Filter to a specific target

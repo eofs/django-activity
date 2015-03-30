@@ -49,8 +49,8 @@ class ActivityRegistry(object):
         self.handlers[id] = handler_class()
 
     def autodiscover(self):
+        from importlib import import_module
         from django.conf import settings
-        from django.utils.importlib import import_module
 
         for app in settings.INSTALLED_APPS:
             try:

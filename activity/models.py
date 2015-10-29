@@ -3,7 +3,7 @@ from django.db import models, connection
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 from django.utils.timesince import timesince as _timesince
 from django.utils.translation import ugettext as _
@@ -24,15 +24,15 @@ class Action(models.Model):
 
     actor_content_type = models.ForeignKey(ContentType, related_name='actor')
     actor_object_id = models.PositiveIntegerField()
-    actor = generic.GenericForeignKey('actor_content_type', 'actor_object_id')
+    actor = GenericForeignKey('actor_content_type', 'actor_object_id')
 
     action_object_content_type = models.ForeignKey(ContentType, related_name='action_object', blank=True, null=True)
     action_object_object_id = models.CharField(max_length=255, blank=True, null=True)
-    action_object = generic.GenericForeignKey('action_object_content_type', 'action_object_object_id')
+    action_object = GenericForeignKey('action_object_content_type', 'action_object_object_id')
 
     target_content_type = models.ForeignKey(ContentType, related_name='target', blank=True, null=True)
     target_object_id = models.CharField(max_length=255, blank=True, null=True)
-    target = generic.GenericForeignKey('target_content_type', 'target_object_id')
+    target = GenericForeignKey('target_content_type', 'target_object_id')
 
     created = models.DateTimeField(auto_now_add=True)
     public = models.BooleanField(default=True)
@@ -105,7 +105,7 @@ class Follow(models.Model):
     # Object to Follow
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    follow_object = generic.GenericForeignKey()
+    follow_object = GenericForeignKey()
     actor_only = models.BooleanField('Only follow actions where the object is the actor', default=True)
 
     started = models.DateTimeField(auto_now_add=True)

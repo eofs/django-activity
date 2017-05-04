@@ -1,6 +1,7 @@
 from activity.models import Action
 from activity.registry import activityregistry
 
+
 class ActivitiesView(object):
     def render(self, item):
         """

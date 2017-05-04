@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
+from django.utils import timezone
 from django.utils.timesince import timesince as _timesince
 from django.utils.translation import ugettext as _
 
@@ -34,7 +35,7 @@ class Action(models.Model):
     target_object_id = models.CharField(max_length=255, blank=True, null=True)
     target = GenericForeignKey('target_content_type', 'target_object_id')
 
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now)
     public = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
 

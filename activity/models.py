@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 
 from activity.registry import activityregistry
 from activity.signals import action
-from activity.managers import ActionManager, FollowManager, StreamManager
+from activity.managers import ActionQuerySet, FollowManager, StreamManager
 from activity.tasks import fanout_action
 
 
@@ -39,7 +39,7 @@ class Action(models.Model):
     public = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
 
-    objects = ActionManager()
+    objects = ActionQuerySet.as_manager()
 
     class Meta:
         ordering = ('-created',)

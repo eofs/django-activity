@@ -74,10 +74,8 @@ class ActionQuerySet(QuerySet):
                 others_by_content_type[content_type_id].append(object_id)
 
         for content_type_id, object_ids in actors_by_content_type.iteritems():
-            q = q | Q(
-                actor_content_type=content_type_id,
-                actor_object_id__in=object_ids,
-            )
+            q |= Q(actor_content_type=content_type_id, actor_object_id__in=object_ids)
+
         for content_type_id, object_ids in others_by_content_type.iteritems():
             q = q | Q(
                 target_content_type=content_type_id,
@@ -86,6 +84,7 @@ class ActionQuerySet(QuerySet):
                 action_object_content_type=content_type_id,
                 action_object_object_id__in=object_ids,
             )
+
         return qs.filter(q, **kwargs)
 
     def stream(self, user, **kwargs):
@@ -94,24 +93,6 @@ class ActionQuerySet(QuerySet):
         """
         qs = self.public()
         return qs.filter(stream__user=user)
-
-
-class ActionManager(Manager):
-    """
-    Manager for Action model
-    """
-    def get_queryset(self):
-        return ActionQuerySet(self.model, using=self._db)
-
-    def __getattr__(self, attr, *args):
-        """
-        Pass every method/attr access call to ActionQuerySet if
-        it has requested element available.
-        """
-        try:
-            return getattr(self.__class__, attr, *args)
-        except AttributeError:
-            return getattr(self.get_queryset(), attr, *args)
 
 
 class StreamManager(Manager):

@@ -35,7 +35,7 @@ class Action(models.Model):
     target_object_id = models.CharField(max_length=255, blank=True, null=True)
     target = GenericForeignKey('target_content_type', 'target_object_id')
 
-    created = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(db_index=True, default=timezone.now)
     public = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
 

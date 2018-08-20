@@ -15,7 +15,7 @@ author = 'Tomi Pajunen'
 author_email = 'tomi@madlab.fi'
 license = 'BSD'
 install_requires = [
-    'django>=1.9,<2.0'
+    'django>=1.9'
 ]
 
 
@@ -55,9 +55,9 @@ def get_package_data(package):
 if sys.argv[-1] == 'publish':
     os.system("python setup.py sdist upload")
     args = {'version': get_version(package)}
-    print "You probably want to also tag the version now:"
-    print "  git tag -a %(version)s -m 'version %(version)s'" % args
-    print "  git push --tags"
+    print("You probably want to also tag the version now:")
+    print("  git tag -a %(version)s -m 'version %(version)s'" % args)
+    print("  git push --tags")
     sys.exit()
 
 

@@ -23,15 +23,17 @@ class Action(models.Model):
     """
     handler = models.CharField(max_length=255)
 
-    actor_content_type = models.ForeignKey(ContentType, related_name='actor')
+    actor_content_type = models.ForeignKey(ContentType, related_name='actor', on_delete=models.CASCADE)
     actor_object_id = models.PositiveIntegerField()
     actor = GenericForeignKey('actor_content_type', 'actor_object_id')
 
-    action_object_content_type = models.ForeignKey(ContentType, related_name='action_object', blank=True, null=True)
+    action_object_content_type = models.ForeignKey(ContentType, related_name='action_object', blank=True,
+                                                   null=True, on_delete=models.CASCADE)
     action_object_object_id = models.CharField(max_length=255, blank=True, null=True)
     action_object = GenericForeignKey('action_object_content_type', 'action_object_object_id')
 
-    target_content_type = models.ForeignKey(ContentType, related_name='target', blank=True, null=True)
+    target_content_type = models.ForeignKey(ContentType, related_name='target', blank=True, null=True,
+                                            on_delete=models.CASCADE)
     target_object_id = models.CharField(max_length=255, blank=True, null=True)
     target = GenericForeignKey('target_content_type', 'target_object_id')
 
@@ -88,8 +90,8 @@ class Stream(models.Model):
     User's activity stream item. This is used to pre-populate activity streams
     and to avoid scans on Action table.
     """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    action = models.ForeignKey(Action)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    action = models.ForeignKey(Action, on_delete=models.CASCADE)
 
     objects = StreamManager()
 
@@ -101,10 +103,10 @@ class Follow(models.Model):
     """
     Let user to follow activities of any user or object
     """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     # Object to Follow
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     follow_object = GenericForeignKey()
     actor_only = models.BooleanField('Only follow actions where the object is the actor', default=True)

@@ -24,9 +24,9 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('public', models.BooleanField(default=True)),
                 ('is_global', models.BooleanField(default=False)),
-                ('action_object_content_type', models.ForeignKey(related_name='action_object', blank=True, to='contenttypes.ContentType', null=True)),
-                ('actor_content_type', models.ForeignKey(related_name='actor', to='contenttypes.ContentType')),
-                ('target_content_type', models.ForeignKey(related_name='target', blank=True, to='contenttypes.ContentType', null=True)),
+                ('action_object_content_type', models.ForeignKey(related_name='action_object', blank=True, to='contenttypes.ContentType', null=True, on_delete=models.CASCADE)),
+                ('actor_content_type', models.ForeignKey(related_name='actor', to='contenttypes.ContentType', on_delete=models.CASCADE)),
+                ('target_content_type', models.ForeignKey(related_name='target', blank=True, to='contenttypes.ContentType', null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-created',),
@@ -40,8 +40,8 @@ class Migration(migrations.Migration):
                 ('object_id', models.PositiveIntegerField()),
                 ('actor_only', models.BooleanField(default=True, verbose_name=b'Only follow actions where the object is the actor')),
                 ('started', models.DateTimeField(auto_now_add=True)),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -51,8 +51,8 @@ class Migration(migrations.Migration):
             name='Stream',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('action', models.ForeignKey(to='activity.Action')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('action', models.ForeignKey(to='activity.Action', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },

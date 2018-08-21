@@ -1,6 +1,6 @@
 from django.utils.module_loading import autodiscover_modules
 
-__version__ = '0.6.2'
+__version__ = '0.6.3'
 
 try:
     from activity.signals import action
